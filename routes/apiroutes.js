@@ -1,84 +1,90 @@
-const express = require('express');
-const router = express.Router();
-const db = require("../models");
+// DEPENDENCIES
+const router = require("express").Router();
+const Workout = require("../models/workout");
 
-router.get("/api/workouts", (req, res) => {
-    db.Workout.find()
-    .then(dbWorkout => {
-        res.json(dbWorkout);
+
+// ==CRUD OPERATIONS==
+
+// GET/READ WORKOUT
+router.get("/api/workouts", (req,res) => {
+    Workout.find({})
+    // add index to sort by ascending days
+    .sort({ day: 1})
+    .then((data) => {
+        res.json(data);
+        console.log(data);
     })
-    .catch(err => {
+    // if there is an error, display error
+    .catch((err) => {
         res.status(400).json(err);
-  
-    })
-});
-
-router.post("/api/workouts", ({ body }, res) => {
-    db.Workout.create(body)
-    .then(dbWorkout => {
-        res.json(dbWorkout);
-    })
-    .catch(err => {
-        res.json(err);
+        console.log(err);
     });
 });
 
-router.get("/api/workouts/range", (req, res) => {
-    db.Workout.find()
-    .then(dbWorkout => {
-        res.json(dbWorkout);
+
+// CREATE WORKOUT
+router.post("/api/workouts", ({ body },res) => {
+    Workout.create(body)
+    .then((data) => {
+        res.json(data);
+        console.log(data);
     })
-    .catch(err => {
+    // if there is an error, display error
+    .catch((err) => {
         res.status(400).json(err);
-  
+        console.log(err);
+    });
+});
+
+
+// UPDATE WORKOUT BY ID
+router.put("/api/workouts/:id", ({ body, params },res) => {
+    Workout.findByIdAndUpdate(
+        params.id,
+        { $push: { exercises: body } },
+        { new: true, runValidators: true }
+    )
+    .then((data) => {
+        res.json(data);
+        console.log(data);
     })
-
+    // if there is an error, display error
+    .catch((err) => {
+        res.status(400).json(err);
+        console.log(err);
+    });
 });
 
-router.get("/api/workouts/:id", (req, res) => {
-    
-        const { id } = req.params;
-        db.Workout.findOne({
-            _id: id,
-        }).then(dbWorkout => {
-            res.json(dbWorkout);
-        })
-        .catch(err => {
-            res.status(400).json
-        })
-   
-});
 
-router.put("/api/workouts/:id", ({body, params}, res) => {
-    // console.log(body, params)
-    const id = params.id;
-    let savedExercises = [];
-
-    // gets all the currently saved exercises in the current workout
-    db.Workout.find({_id: id})
-        .then(dbWorkout => {
-            // console.log(dbWorkout);
-            savedExercises = dbWorkout[0].exercises;
-            // console.log('savedExcercises', savedExercises);
-            // console.log('longway', dbWorkout[0].exercises);
-            res.json(savedExercises);
-            // console.log('body', body);
-            let allExercises = [...savedExercises, body];
-            // console.log('allExercises', allExercises);
-            updateWorkout(allExercises);
+// GET/READ STATS
+router.get("/api/workouts/range", (req,res) => {
+    Workout.find()
+        .then((data) => {
+            res.json(data);
+            console.log(data);
         })
-        .catch(err => {
-            res.json(err);
+    // if there is an error, display error
+        .catch((err) => {
+            res.status(400).json(err);
+            console.log(err);
         });
-
-    function updateWorkout(exercises){
-        db.Workout.findByIdAndUpdate(id, {exercises: exercises}, function(err, doc){
-        if(err){
-            console.log(err)
-        }
-        })
-    }        
 });
 
 
-module.exports = router;v
+// POST STATS
+router.post("/api/workouts/range", (req,res) => {
+    Workout.create({})
+        .then((data) => {
+            res.json(data);
+            console.log(data);
+        })
+        // if there is an error, display error
+        .catch((err) => {
+            res.status(400).json(err);
+            console.log(err);
+        });
+});
+
+
+// EXPORTS
+module.exports = router;

@@ -1,31 +1,42 @@
+
+// DEPENDENCIES
 const express = require("express");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 
+// const mongojs = require("mongojs");
+// const db = mongojs("mongodb://localhost/workout", ["workoutdb"]);
 
-const PORT = process.env.PORT || 3000;
 
+
+// PORT
+const PORT = process.env.PORT || 4000;
+
+
+// MIDDLEWARE
 const app = express();
 
 app.use(logger("dev"));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(express.static("public"));
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", {
-  useNewUrlParser: true,
-  useFindAndModify: false
 
-}, () => 
-console.log("Connected to DB")
-);
-
-// routes
-app.use(require("./routes/api-routes"));
-app.use(require("./routes/html-routes"));
-
-app.listen(PORT, () => {
-  console.log(`App running on port ${PORT}!`);
+// CONNECT TO MONGO DB W/MONGOOSE
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workoutdb", {
+    useNewUrlParser: true,
+    useFindAndModify: false
 });
 
+
+// ROUTES
+app.use(require("./routes/routes_api.js"));
+app.use(require("./routes/routes_html.js"));
+
+
+// START SERVER
+app.listen(PORT, () => {
+    console.log(`App is running on port ${PORT}!`);
+});
