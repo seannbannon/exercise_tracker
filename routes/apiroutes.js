@@ -1,6 +1,6 @@
 // DEPENDENCIES
 const router = require("express").Router();
-const Workout = require("../models/workout");
+const Workout = require("../develop/models/workout.js");
 
 
 // ==CRUD OPERATIONS==
